@@ -42,21 +42,30 @@ namespace URL_Shortener.Data.Services
 
             var createdId = await connection.ExecuteScalarAsync(insertStatement, newShortnedUrl);
 
-
             newShortnedUrl.ShortenedURL += createdId.ToString();
 
-            var updateStatement = "UPDATE \"URL\" SET \"ShortenedUrl\" = @updatedShortenedUrl WHERE id = @id";
+            var updateStatement = "UPDATE \"URL\" SET \"ShortenedURL\" = @updatedShortenedUrl WHERE id = @id";
 
             var affected = await connection.ExecuteAsync(updateStatement, new { updatedShortenedUrl = newShortnedUrl.ShortenedURL, id = createdId });
 
             return newShortnedUrl;
+        }
 
+        public async Task<URL> GetURL(string shortenedUrl)
+        {
+            var urlId = Int32.Parse(shortenedUrl.Substring(8));
+            var selectStatement = "SELECT * FROM \"URL\" WHERE \"ShortenedURL\" = @url AND id = @id";
+
+            using var connection = new NpgsqlConnection(_connString);
+            var url = await connection.QueryFirstAsync<URL>(selectStatement, new { url = shortenedUrl, id = urlId });
+
+            return url;
         }
 
 
         private string shortenedUrlGenerator()
         {
-            const string Charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            const string Charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             return string.Create<object?>(8, null, static (chars, _) => Random.Shared.GetItems(Charset, chars));
         }
 

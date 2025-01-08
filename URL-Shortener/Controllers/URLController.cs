@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 using URL_Shortener.Data.Models;
 using URL_Shortener.Data.Services;
 
@@ -23,7 +24,22 @@ namespace URL_Shortener.Controllers
         {
             var urls = await _urlService.GetAll();
 
-            return Ok(Url);
+            return Ok(urls);
+        }
+
+        public async Task<ActionResult<URL>> Post([FromBody]JObject originalUrl)
+        {
+            string originalUrlString = originalUrl["originalUrl"].ToString();
+            var url = await _urlService.ShortenURL(originalUrlString, HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? "");
+            return Ok(url);
+        }
+
+        [HttpGet("{shortenedUrl}")]
+        public async Task<IActionResult> Get(string shortenedUrl)
+        {
+            var url = await _urlService.GetURL(shortenedUrl);
+
+            return StatusCode(302, url.OriginalURL);
         }
     }
 }
