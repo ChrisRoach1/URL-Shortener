@@ -4,3 +4,8 @@ GET {{URL_Shortener_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
+
+GET {{URL_Shortener_HostAddress}}/api/URL/
+Accept: application/json
+
+###
