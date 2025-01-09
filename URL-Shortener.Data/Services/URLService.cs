@@ -48,6 +48,7 @@ namespace URL_Shortener.Data.Services
 
             var affected = await connection.ExecuteAsync(updateStatement, new { updatedShortenedUrl = newShortnedUrl.ShortenedURL, id = createdId });
 
+            
             return newShortnedUrl;
         }
 

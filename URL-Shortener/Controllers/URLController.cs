@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using FluentResults;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Newtonsoft.Json.Linq;
 using URL_Shortener.Data.Models;
 using URL_Shortener.Data.Services;
@@ -27,11 +29,26 @@ namespace URL_Shortener.Controllers
             return Ok(urls);
         }
 
-        public async Task<ActionResult<URL>> Post([FromBody]JObject originalUrl)
+        [EnableRateLimiting("fixed")]
+        public async Task<Result<URL>> Post([FromBody]JObject originalUrl)
         {
             string originalUrlString = originalUrl["originalUrl"].ToString();
-            var url = await _urlService.ShortenURL(originalUrlString, HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? "");
-            return Ok(url);
+            try
+            {
+                var url = await _urlService.ShortenURL(originalUrlString, HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? "");
+
+                if (url == null)
+                {
+                    return Result.Fail<URL>("failed to create shortened URL");
+                }
+
+                return Result.Ok<URL>(url);
+
+            }catch(Exception ex)
+            {
+                return Result.Fail(new Error("unknown error occurred").CausedBy(ex));
+            }
+
         }
 
         [HttpGet("{shortenedUrl}")]
@@ -39,7 +56,14 @@ namespace URL_Shortener.Controllers
         {
             var url = await _urlService.GetURL(shortenedUrl);
 
-            return StatusCode(302, url.OriginalURL);
+            if(url == null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                return StatusCode(302, url.OriginalURL);
+            } 
         }
     }
 }
