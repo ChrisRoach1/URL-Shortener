@@ -16,6 +16,11 @@
       <ProjectReference Include="..\URL-Shortener.Data\URL-Shortener.Data.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="FluentResults" Version="3.16.0" />
+      <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    </ItemGroup>
+
     <Target Name="Tailwind" BeforeTargets="Build">
         <Exec Command="npm run css:build" />
     </Target>

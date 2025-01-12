@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -43,7 +44,11 @@ public class IndexModel : PageModel
     public async Task<IActionResult> OnPost(string originalUrl)
     {
         var returnUrl = await _httpClient.PostAsJsonAsync("api/URL/", originalUrl);
-        var url = await returnUrl.Content.ReadFromJsonAsync<URL>();
+        var options = new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        };
+        var url = await returnUrl.Content.ReadFromJsonAsync<URL>(options);
 
         ShortenedURLResult = HttpContext.Request.GetDisplayUrl() + url.ShortenedURL;
         TempData["Response"] = ShortenedURLResult;

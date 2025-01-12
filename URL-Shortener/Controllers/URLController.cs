@@ -1,8 +1,12 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using FluentResults;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Newtonsoft.Json.Linq;
 using URL_Shortener.Data.Models;
 using URL_Shortener.Data.Services;
+using ZiggyCreatures.Caching.Fusion;
 
 namespace URL_Shortener.Controllers
 {
@@ -29,22 +33,17 @@ namespace URL_Shortener.Controllers
         }
 
         [EnableRateLimiting("fixed")]
-        public async Task<ActionResult<URL>> Post([FromBody]string originalUrl)
+        public async Task<IActionResult> Post([FromBody]string originalUrl)
         {
             try
             {
-                var url = await _urlService.ShortenURL(originalUrlString, HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? "");
+                var url = await _urlService.ShortenURL(originalUrl, HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? "");
 
-                if (url == null)
-                {
-                    return Result.Fail<URL>("failed to create shortened URL");
-                }
-
-                return Result.Ok<URL>(url);
+                return Ok(url);
 
             }catch(Exception ex)
             {
-                return Result.Fail(new Error("unknown error occurred").CausedBy(ex));
+                return Problem(ex.Message);
             }
         }
 
