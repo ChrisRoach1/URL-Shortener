@@ -1,4 +1,6 @@
+using Microsoft.Extensions.Caching.Memory;
 using URL_Shortener.Data.Services;
+using ZiggyCreatures.Caching.Fusion;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +11,12 @@ builder.Services.AddControllers();
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
 {
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+});
+
+builder.Services.AddFusionCache().WithDefaultEntryOptions(opt =>
+{
+    opt.Duration = TimeSpan.FromMinutes(10);
+    opt.Priority = CacheItemPriority.High;
 });
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

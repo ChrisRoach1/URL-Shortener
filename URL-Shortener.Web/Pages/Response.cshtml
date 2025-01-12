@@ -1,0 +1,17 @@
+@page "/response"
+@model URL_Shortener.Web.Pages.Response
+
+@{
+    ViewData["Title"] = "Response";
+}
+
+<div
+    class="container max-w-sm py-32 mx-auto mt-px text-left sm:max-w-md md:max-w-lg sm:px-4 md:max-w-none md:text-center">
+    <h1 class="text-3xl font-bold leading-10 tracking-tight text-left text-gray-900 md:text-center sm:text-4xl md:text-7xl lg:text-8xl">
+        Your Shortened URL</h1>
+    <div class="mt-5 w-full max-w-xs mx-auto">
+
+        <div class="mx-auto mt-5 text-gray-400 md:mt-8 md:max-w-lg md:text-center md:text-xl">@TempData["Response"]</div>
+
+    </div>
+</div>
