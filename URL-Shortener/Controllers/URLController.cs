@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using URL_Shortener.Data.Models;
 using URL_Shortener.Data.Services;
-using ZiggyCreatures.Caching.Fusion;
 
 namespace URL_Shortener.Controllers
 {
@@ -29,10 +28,24 @@ namespace URL_Shortener.Controllers
             return Ok(urls);
         }
 
+        [EnableRateLimiting("fixed")]
         public async Task<ActionResult<URL>> Post([FromBody]string originalUrl)
         {
-            var url = await _urlService.ShortenURL(originalUrl, HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? "");
-            return Ok(url);
+            try
+            {
+                var url = await _urlService.ShortenURL(originalUrlString, HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? "");
+
+                if (url == null)
+                {
+                    return Result.Fail<URL>("failed to create shortened URL");
+                }
+
+                return Result.Ok<URL>(url);
+
+            }catch(Exception ex)
+            {
+                return Result.Fail(new Error("unknown error occurred").CausedBy(ex));
+            }
         }
 
         [HttpGet("{shortenedUrl}")]
