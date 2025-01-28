@@ -1,12 +1,23 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>URL Shortener</title>
     <link rel="stylesheet" href="~/css/output.css" />
 </head>
-<body>
+
+<body class="min-h-screen bg-gradient-to-br from-purple-600 via-blue-500 to-teal-400">
+    <!-- Navigation -->
+    <nav class="relative z-50 px-6">
+        <div class="flex items-center h-24">
+            <a asp-page="index" class="flex items-center space-x-2 font-extrabold text-white">
+                <span>URL Shortener</span>
+            </a>
+        </div>
+    </nav>
     @RenderBody()
 </body>
+
 </html>
